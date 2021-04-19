@@ -12,7 +12,7 @@ class Especialidade(models.Model):
     nome_especialidade = models.CharField(max_length=100,unique=True)
 
     def __str__(self):
-        return self.especialidade
+        return self.nome_especialidade
 
 class Medico(models.Model):
     nome_medico = models.CharField(max_length=100)
