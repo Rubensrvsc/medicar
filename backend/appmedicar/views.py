@@ -8,6 +8,17 @@ from django.db.models import Q
 from .serializers import *
 # Create your views here.
 
+class EspecialidadeListView(generics.ListAPIView):
+
+    serializer_class = EspecialidadeSerializer
+
+    def get_queryset(self):
+        search = self.request.query_params.get('search',None)
+        especialidade = Especialidade.objects.all()
+        if search is not None:
+            return especialidade.filter(nome_especialidade__icontains=search)
+        return especialidade
+
 class UserCreateView(APIView):
 
     serializer_class = UserSerializer
