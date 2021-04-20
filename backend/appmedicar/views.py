@@ -19,6 +19,23 @@ class EspecialidadeListView(generics.ListAPIView):
             return especialidade.filter(nome_especialidade__icontains=search)
         return especialidade
 
+class MedicoListView(generics.ListAPIView):
+
+    serializer_class = MedicoListSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        search = self.request.query_params.get('search',None)
+        especialidade = self.request.query_params.getlist('especialidade',None)
+        medico = Medico.objects.all()
+
+        if search is not None:
+            medico = medico.filter(nome_medico__icontains=search)
+        elif especialidade is not None:
+            medico = medico.filter(especialidade_medico__id__in=list(especialidade))
+
+        return medico
+
 class UserCreateView(APIView):
 
     serializer_class = UserSerializer

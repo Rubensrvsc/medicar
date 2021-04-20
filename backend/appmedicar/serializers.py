@@ -8,6 +8,17 @@ class EspecialidadeSerializer(serializers.ModelSerializer):
         model = Especialidade
         fields = '__all__'
 
+class MedicoListSerializer(serializers.ModelSerializer):
+
+    especialidade = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Medico
+        fields = ['id','nome_medico','crm','email','telefone','especialidade']
+    
+    def get_especialidade(self,instance):
+        return Especialidade.objects.filter(medico=instance.id).values('id','nome_especialidade')
+
 class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
