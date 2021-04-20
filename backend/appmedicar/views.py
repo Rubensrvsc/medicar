@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.utils.timezone import now,localtime,localdate 
 from django.db.models import Q
 from .serializers import *
 # Create your views here.
@@ -35,6 +36,19 @@ class MedicoListView(generics.ListAPIView):
             medico = medico.filter(especialidade_medico__id__in=list(especialidade))
         
         return medico
+
+class ConsultaListView(generics.ListAPIView):
+
+    serializer_class = ConsultaSerializerList
+
+    def get_queryset(self):
+        queryset = Consulta.objects.filter(cliente__username=self.request.user__username)
+        queryset = queryset.exclude(Q(agenda__dia__lt=localdate()) | 
+        Q(agenda__dia=localdate()) & 
+        Q(horario__hora__lt=localtime())).order_by('agenda__dia'
+        ).order_by('horario__hora')
+
+        return queryset
 
 class UserCreateView(APIView):
 

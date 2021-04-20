@@ -20,6 +20,23 @@ class MedicoListSerializer(serializers.ModelSerializer):
         return Especialidade.objects.filter(medico=instance.id).values('id','nome_especialidade')
 
 
+class ConsultaSerializerList(serializers.ModelSerializer):
+
+    dia = serializers.PrimaryKeyRelatedField(source='agenda.dia',queryset=Agenda.objects.all())
+    horario = serializers.PrimaryKeyRelatedField(source='horario.hora',queryset=Horario.objects.all())
+    medico = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Consulta
+        fields = ['id','dia','horario','data_agendamento','medico',]
+    
+    def get_medico(self,instance):
+        medico = MedicoListSerializer(
+            instance=instance.agenda.medico,
+            many=False
+        )
+        return medico.data
+
 
 class UserSerializer(serializers.ModelSerializer):
     
