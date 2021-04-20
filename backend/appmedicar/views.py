@@ -21,3 +21,16 @@ class UserCreateView(APIView):
         Token.objects.create(user=usuario)
         token = Token.objects.get(user=usuario)
         return Response({'token':token.key})
+
+class ObterTokenView(APIView):
+
+    serializer_class = ObterTokenSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = Token.objects.all()
+
+    def post(self,request):
+        token = Token.objects.filter(Q(user__username = request.POST['username']) & 
+        Q(user__password=request.POST['password'])).first()
+        if token:
+            return Response({'token':token.key})
+        return Response(status=status.HTTP_404_NOT_FOUND)
