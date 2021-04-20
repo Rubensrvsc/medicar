@@ -14,10 +14,12 @@ class MedicoListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Medico
-        fields = ['id','nome_medico','crm','email','telefone','especialidade']
+        fields = ['id','crm','nome_medico','especialidade']
     
     def get_especialidade(self,instance):
         return Especialidade.objects.filter(medico=instance.id).values('id','nome_especialidade')
+
+
 
 class UserSerializer(serializers.ModelSerializer):
     

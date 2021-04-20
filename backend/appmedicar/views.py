@@ -29,11 +29,11 @@ class MedicoListView(generics.ListAPIView):
         especialidade = self.request.query_params.getlist('especialidade',None)
         medico = Medico.objects.all()
 
-        if search is not None:
+        if search:
             medico = medico.filter(nome_medico__icontains=search)
-        elif especialidade is not None:
+        elif especialidade:
             medico = medico.filter(especialidade_medico__id__in=list(especialidade))
-
+        
         return medico
 
 class UserCreateView(APIView):
