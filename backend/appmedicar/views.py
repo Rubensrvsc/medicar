@@ -94,6 +94,9 @@ class ConsultaCreateView(generics.CreateAPIView):
 
             if consulta_ja_marcada.exists() == True:
                 return Response({'Erro': 'Já existe uma consulta para este dia e horario'},status=status.HTTP_401_UNAUTHORIZED)
+            
+            if agenda_user.horario.filter(hora=request.data['horario']).exists()==False:
+                return Response({'Erro': 'Esse horario não existe nessa agenda'},status=status.HTTP_404_NOT_FOUND)
 
             horario = Horario.objects.get(hora=request.data['horario'])
             agenda = Agenda.objects.get(id=request.data['agenda'])
