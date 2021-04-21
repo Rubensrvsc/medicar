@@ -54,7 +54,7 @@ class AgendaListView(generics.ListAPIView):
 
     serializer_class = AgendaSerializer
     queryset = Agenda.objects.all()
-
+    permission_classes = [permissions.AllowAny]
     def get_queryset(self):
         medico_params = self.request.query_params.getlist('medico',None)
         especialidade_params = self.request.query_params.getlist('especialidade',None)
