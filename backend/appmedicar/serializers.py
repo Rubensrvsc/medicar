@@ -53,3 +53,9 @@ class ObterTokenSerializer(serializers.Serializer):
 
     username = serializers.CharField
     password = serializers.CharField
+
+class DesmarcarConsultaSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Consulta
+        fields = '__all__'
