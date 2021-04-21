@@ -37,6 +37,11 @@ class ConsultaSerializerList(serializers.ModelSerializer):
         )
         return medico.data
 
+class ConsultaSerializerCreate(serializers.Serializer):
+
+    agenda = serializers.IntegerField()
+    horario = serializers.TimeField()
+
 
 class UserSerializer(serializers.ModelSerializer):
     

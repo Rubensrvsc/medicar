@@ -8,4 +8,5 @@ urlpatterns = [
     path('especialidades/',EspecialidadeListView.as_view(),name='especialidade-list'),
     path('medicos/',MedicoListView.as_view(),name='medico-list'),
     path('consultas/',ConsultaListView.as_view(),name='consultas-list'),
+    path('agendar_consulta/',ConsultaCreateView.as_view(),name='create-consulta'),
 ]

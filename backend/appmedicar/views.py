@@ -64,6 +64,60 @@ class UserCreateView(APIView):
         token = Token.objects.get(user=usuario)
         return Response({'token':token.key})
 
+class ConsultaCreateView(generics.CreateAPIView):
+
+    serializer_class = ConsultaSerializerCreate
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+    
+        agenda = Agenda.objects.filter(id=request.data['agenda'])
+        
+        if agenda.exists() == True:
+            if agenda.filter(Q(dia__lt=localdate())).exists():
+                print(request.data['horario'])
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            agenda_hora_passada = agenda.get(id=request.data['agenda'])
+            if agenda_hora_passada.dia == localdate() and datetime.strptime(request.data['horario'],'%H:%M').time() < localtime().time():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            agenda_user = Agenda.objects.get(id=request.data['agenda'])
+
+            consulta_cliente = Consulta.objects.filter(Q(agenda__id=agenda_user.id) & Q(agenda__dia=agenda_user.dia) 
+            & Q(horario__hora=request.data['horario']) & Q(cliente__username=self.request.user.username) & Q(isMarcada=True))
+            
+            if consulta_cliente.exists() == True:
+                return Response({'Erro': 'Cliente já marcou uma consulta para este dia e horario'},status=status.HTTP_401_UNAUTHORIZED)
+
+            consulta_ja_marcada = Consulta.objects.filter(Q(agenda__id=agenda_user.id) & Q(agenda__dia=agenda_user.dia) 
+            & Q(horario__hora=request.data['horario'])& Q(isMarcada=True))
+
+            if consulta_ja_marcada.exists() == True:
+                return Response({'Erro': 'Já existe uma consulta para este dia e horario'},status=status.HTTP_401_UNAUTHORIZED)
+
+            horario = Horario.objects.get(hora=request.data['horario'])
+            agenda = Agenda.objects.get(id=request.data['agenda'])
+            user = User.objects.get(username=self.request.user.username)
+            consulta_criada = Consulta.objects.create(agenda=agenda,cliente=user,
+            horario=horario)
+            
+            return Response({
+                'id':consulta_criada.id,
+                'dia':consulta_criada.agenda.dia,
+                'horario':consulta_criada.horario.hora,
+                'data_agendamento':consulta_criada.data_agendamento,
+                'medico':{
+                    'id': consulta_criada.agenda.medico.id,
+                    'crm':consulta_criada.agenda.medico.crm,
+                    'nome': consulta_criada.agenda.medico.nome_medico,
+                    'especialidade':{
+                        'id': consulta_criada.agenda.medico.especialidade_medico.id,
+                        'especialidade': consulta_criada.agenda.medico.especialidade_medico.especialidade
+                    },
+                },
+            })
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 class ObterTokenView(APIView):
 
     serializer_class = ObterTokenSerializer
