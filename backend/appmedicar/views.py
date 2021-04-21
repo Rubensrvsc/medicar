@@ -50,19 +50,49 @@ class ConsultaListView(generics.ListAPIView):
 
         return queryset
 
-class UserCreateView(APIView):
+class AgendaListView(generics.ListAPIView):
 
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [permissions.AllowAny]
+    serializer_class = AgendaSerializer
+    queryset = Agenda.objects.all()
 
-    def post(self,request):
-        user = User(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'])
-        user.save()
-        usuario = User.objects.get(pk=user.pk)
-        Token.objects.create(user=usuario)
-        token = Token.objects.get(user=usuario)
-        return Response({'token':token.key})
+    def get_queryset(self):
+        medico_params = self.request.query_params.getlist('medico',None)
+        especialidade_params = self.request.query_params.getlist('especialidade',None)
+        data_inicio = self.request.query_params.get('data_inicio',None)
+        data_fim = self.request.query_params.get('data_fim',None)
+
+        agenda = Agenda.objects.all()
+        agenda = Agenda.objects.filter(Q(dia__gte=localdate()) | Q(dia=localdate()) ).order_by('dia')
+        for i in agenda.filter(Q(dia__gte=localdate())): 
+            if i.dia == localdate():
+                hora_passada=0
+                hora_marcadas= i.consulta_agenda.filter(Q(isMarcada=True) & Q(horario__hora__gt=localtime())).count()
+                hora_passada = i.horario.filter(Q(hora__lt=localtime()) & Q(agenda__dia=localdate())).count()
+                hora_agenda= i.horario.count() 
+   
+                if hora_marcadas+ hora_passada == hora_agenda: 
+                    agenda=agenda.exclude(id=i.id) 
+            hora_marcadas= i.consulta_agenda.filter(Q(isMarcada=True)).count() 
+
+            hora_agenda= i.horario.count() 
+  
+            if hora_marcadas == hora_agenda: 
+                agenda=agenda.exclude(id=i.id) 
+        if medico_params:
+            condition_medico = Q()
+            for m in medico_params:
+                condition_medico |= Q(medico=m)
+            agenda = agenda.filter(condition_medico)
+        if especialidade_params:
+            condition_especialidade = Q()
+            for e in especialidade_params:
+                condition_especialidade |= Q(medico__especialidade_medico=e)
+            agenda = agenda.filter(condition_especialidade)
+        
+        if data_inicio and data_fim:
+            agenda = agenda.filter(Q(dia__range=[data_inicio,data_fim]))
+        
+        return agenda.all()
 
 class ConsultaCreateView(generics.CreateAPIView):
 
@@ -141,6 +171,21 @@ class DesmarcarConsultaView(generics.DestroyAPIView):
             
             return Response({'Erro':'Essa consulta não foi marcada pelo usuário logado'},status=status.HTTP_404_NOT_FOUND)
         return Response({'Erro':'Essa consulta não existe'},status=status.HTTP_404_NOT_FOUND)
+
+
+class UserCreateView(APIView):
+
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = [permissions.AllowAny]
+
+    def post(self,request):
+        user = User(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'])
+        user.save()
+        usuario = User.objects.get(pk=user.pk)
+        Token.objects.create(user=usuario)
+        token = Token.objects.get(user=usuario)
+        return Response({'token':token.key})
 
 class ObterTokenView(APIView):
 

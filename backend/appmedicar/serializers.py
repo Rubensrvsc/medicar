@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.utils.timezone import now,localtime,localdate 
 from .models import *
 
 class EspecialidadeSerializer(serializers.ModelSerializer):
@@ -48,6 +49,43 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'password')
+
+class AgendaSerializer(serializers.ModelSerializer):
+
+    horarios = serializers.SerializerMethodField()
+    medico = MedicoListSerializer()
+
+    class Meta:
+        model = Agenda
+        fields = ['id','medico','dia','horarios',]
+
+    def get_horarios(self,instance):
+        lista = []
+        if instance.dia == localdate():
+            if instance.consulta_agenda.count()==0:
+                for j in instance.horario.filter(hora__gt=localtime()):
+                    lista.append(j.hora)
+            elif instance.consulta_agenda.count()>0:
+                for i in instance.consulta_agenda.all(): 
+                    for j in instance.horario.filter(hora__gt=localtime()): 
+                        if j.hora != i.horario.hora: 
+                            lista.append(j.hora)
+        
+            return lista
+        if instance.dia > localdate():
+  
+            
+            if instance.consulta_agenda.count()==0:
+                for j in instance.horario.all():
+                    lista.append(j.hora)
+            elif instance.consulta_agenda.count()>0:
+                for i in instance.consulta_agenda.all(): 
+                    for j in instance.horario.all(): 
+                        if j.hora != i.horario.hora: 
+                            lista.append(j.hora)
+        
+            return lista
+
 
 class ObterTokenSerializer(serializers.Serializer):
 
