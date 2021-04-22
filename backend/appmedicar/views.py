@@ -105,10 +105,10 @@ class ConsultaCreateView(generics.CreateAPIView):
         if agenda.exists() == True:
             if agenda.filter(Q(dia__lt=localdate())).exists():
                 print(request.data['horario'])
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'Erro': 'Agenda é de um dia passado'},status=status.HTTP_401_UNAUTHORIZED)
             agenda_hora_passada = agenda.get(id=request.data['agenda'])
             if agenda_hora_passada.dia == localdate() and datetime.strptime(request.data['horario'],'%H:%M').time() < localtime().time():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response({'Erro': 'Agenda do dia de hoje mas o horário já passou'},status=status.HTTP_400_BAD_REQUEST)
 
             agenda_user = Agenda.objects.get(id=request.data['agenda'])
 
@@ -144,7 +144,7 @@ class ConsultaCreateView(generics.CreateAPIView):
                     'nome': consulta_criada.agenda.medico.nome_medico,
                     'especialidade':{
                         'id': consulta_criada.agenda.medico.especialidade_medico.id,
-                        'especialidade': consulta_criada.agenda.medico.especialidade_medico.especialidade
+                        'especialidade': consulta_criada.agenda.medico.especialidade_medico.nome_especialidade
                     },
                 },
             })
