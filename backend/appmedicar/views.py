@@ -23,7 +23,6 @@ class EspecialidadeListView(generics.ListAPIView):
 class MedicoListView(generics.ListAPIView):
 
     serializer_class = MedicoListSerializer
-    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         search = self.request.query_params.get('search',None)
@@ -54,7 +53,7 @@ class AgendaListView(generics.ListAPIView):
 
     serializer_class = AgendaSerializer
     queryset = Agenda.objects.all()
-    permission_classes = [permissions.AllowAny]
+    
     def get_queryset(self):
         medico_params = self.request.query_params.getlist('medico',None)
         especialidade_params = self.request.query_params.getlist('especialidade',None)
