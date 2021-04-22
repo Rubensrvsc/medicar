@@ -111,5 +111,17 @@ class TesteMedicar(TestCase):
             'agenda': 1,
             'horario': '18:00'
         }
-        r = factory.post('/agendar_consulta/',data)
-        self.assertEquals(r.status_code,status.HTTP_200_OK)
+        response = factory.post('/agendar_consulta/',data)
+        self.assertEquals(response.status_code,status.HTTP_200_OK)
+
+    def test_desmarcar_consulta(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'agenda': 1,
+            'horario': '18:00'
+        }
+        factory.post('/agendar_consulta/',data)
+        response = factory.delete('/desmarcar_consulta/1')
+        self.assertEquals(response.status_code,status.HTTP_200_OK)
