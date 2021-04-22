@@ -108,8 +108,8 @@ class TesteMedicar(TestCase):
         token = Token.objects.get(user__username='Joao')
         factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         data = {
-            'agenda': 7,
+            'agenda': 1,
             'horario': '18:00'
         }
         r = factory.post('/agendar_consulta/',data)
-        self.assertEquals(r.status_code,status.HTTP_404_NOT_FOUND)
+        self.assertEquals(r.status_code,status.HTTP_200_OK)
