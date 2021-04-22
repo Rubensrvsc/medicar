@@ -5,6 +5,7 @@ import requests
 from.models import *
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from django.utils.timezone import now,localtime,localdate 
 # Create your tests here.
 
 class TesteMedicar(TestCase):
@@ -21,6 +22,7 @@ class TesteMedicar(TestCase):
         Horario.objects.create(hora='22:00')
         Horario.objects.create(hora='18:00')
         Horario.objects.create(hora='17:00')
+        Horario.objects.create(hora='05:00')
 
         Especialidade.objects.create(nome_especialidade='pediatria')
         Especialidade.objects.create(nome_especialidade='cardiologia')
@@ -38,6 +40,7 @@ class TesteMedicar(TestCase):
         h1 = Horario.objects.get(id=1)
         h2 = Horario.objects.get(id=2)
         h3 = Horario.objects.get(id=3)
+        h4 = Horario.objects.get(id=4)
 
         m1 = Medico.objects.get(id=1)
 
@@ -48,6 +51,10 @@ class TesteMedicar(TestCase):
         a2=Agenda.objects.create(dia='2021-04-18',medico=m1)
         a2.horario.add(h2)
         a2.horario.add(h3)
+
+        a3=Agenda.objects.create(dia=localdate(),medico=m1)
+        a3.horario.add(h1)
+        a3.horario.add(h4)
         
     def test_especialidades(self):
         factory = APIClient()
@@ -82,7 +89,7 @@ class TesteMedicar(TestCase):
         token = Token.objects.get(user__username='Joao')
         factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         response = factory.get('/agendas/')
-        self.assertEqual(len(response.json()),1)
+        self.assertEqual(len(response.json()),2)
         self.assertEquals(response.status_code,status.HTTP_200_OK)
     
     def test_consultas_usuario_logado(self):
@@ -152,4 +159,15 @@ class TesteMedicar(TestCase):
         }
         response = factory.post('/agendar_consulta/',data)
         self.assertEquals(response.status_code,status.HTTP_404_NOT_FOUND)
+    
+    def test_marcar_consulta_horario_passado_de_consulta_existente(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'agenda': 3,
+            'horario': '05:00'
+        }
+        response = factory.post('/agendar_consulta/',data)
+        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
 
