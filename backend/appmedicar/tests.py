@@ -4,6 +4,7 @@ from rest_framework.test import APIRequestFactory, APIClient
 import requests
 from.models import *
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
 # Create your tests here.
 
 class TesteMedicar(TestCase):
@@ -93,3 +94,14 @@ class TesteMedicar(TestCase):
         response = factory.get('/especialidades/?search=c')
         self.assertEqual(len(response.json()),2)
         self.assertEquals(response.status_code,status.HTTP_200_OK)
+    
+    def test_agendar_consulta(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'agenda': 7,
+            'horario': '18:00'
+        }
+        r = factory.post('/agendar_consulta/',data)
+        self.assertEquals(r.status_code,status.HTTP_404_NOT_FOUND)
