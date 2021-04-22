@@ -141,3 +141,15 @@ class TesteMedicar(TestCase):
         }
         response = factory.post('/agendar_consulta/',data)
         self.assertEquals(response.status_code,status.HTTP_401_UNAUTHORIZED)
+
+    def test_marcar_consulta_horario_inexistente(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'agenda': 1,
+            'horario': '13:00'
+        }
+        response = factory.post('/agendar_consulta/',data)
+        self.assertEquals(response.status_code,status.HTTP_404_NOT_FOUND)
+
