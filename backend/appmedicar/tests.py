@@ -79,3 +79,10 @@ class TesteMedicar(TestCase):
         self.assertEqual(len(response.json()),1)
         self.assertEquals(response.status_code,status.HTTP_200_OK)
     
+    def test_consultas_usuario_logado(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        response = factory.get('/consultas/')
+        self.assertEqual(len(response.json()),0)
+    
