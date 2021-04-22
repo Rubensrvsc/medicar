@@ -41,7 +41,7 @@ class ConsultaListView(generics.ListAPIView):
     serializer_class = ConsultaSerializerList
 
     def get_queryset(self):
-        queryset = Consulta.objects.filter(cliente__username=self.request.user__username)
+        queryset = Consulta.objects.filter(cliente__username=self.request.user.username)
         queryset = queryset.exclude(Q(agenda__dia__lt=localdate()) | 
         Q(agenda__dia=localdate()) & 
         Q(horario__hora__lt=localtime())).order_by('agenda__dia'

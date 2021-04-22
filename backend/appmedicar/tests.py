@@ -38,3 +38,10 @@ class TesteMedicar(TestCase):
         response = factory.get('/agendas/')
         self.assertEquals(response.status_code,status.HTTP_200_OK)
     
+    def test_consultas(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        response = factory.get('/consultas/')
+        self.assertEquals(response.status_code,status.HTTP_200_OK)
+    
