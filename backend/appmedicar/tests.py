@@ -95,6 +95,14 @@ class TesteMedicar(TestCase):
         self.assertEqual(len(response.json()),2)
         self.assertEquals(response.status_code,status.HTTP_200_OK)
     
+    def test_medicos_parametros(self):
+        factory = APIClient()
+        token = Token.objects.get(user__username='Joao')
+        factory.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        response = factory.get('/medicos/?search=l&especialidade=1&especialidade=3')
+        self.assertEqual(len(response.json()),1)
+        self.assertEquals(response.status_code,status.HTTP_200_OK)
+    
     def test_agendar_consulta(self):
         factory = APIClient()
         token = Token.objects.get(user__username='Joao')
