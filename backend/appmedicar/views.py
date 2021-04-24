@@ -163,7 +163,7 @@ class DesmarcarConsultaView(generics.DestroyAPIView):
                 | Q(agenda__dia=localdate()) & Q(horario__hora__lte=localtime()) & Q(isMarcada=True) )
                 
                 if consulta_horario.exists():
-                    return Response({'query':'consulta já passou'},status=status.HTTP_404_NOT_FOUND)
+                    return Response({'Erro':'consulta já passou'},status=status.HTTP_404_NOT_FOUND)
 
 
                 return Response(consulta_usuario.filter(id=id).first().delete(),status=status.HTTP_200_OK)
