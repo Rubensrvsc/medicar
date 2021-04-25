@@ -104,7 +104,6 @@ class ConsultaCreateView(generics.CreateAPIView):
         
         if agenda.exists() == True:
             if agenda.filter(Q(dia__lt=localdate())).exists():
-                print(request.data['horario'])
                 return Response({'Erro': 'Agenda é de um dia passado'},status=status.HTTP_401_UNAUTHORIZED)
             agenda_hora_passada = agenda.get(id=request.data['agenda'])
             if agenda_hora_passada.dia == localdate() and datetime.strptime(request.data['horario'],'%H:%M').time() < localtime().time():
