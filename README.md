@@ -1,4 +1,4 @@
-# medicar
+# Medicar
 
 
 ## Repositorio do teste de backend engenieer na IntMed
@@ -18,6 +18,14 @@ Django Rest Framework
 
 ```
 pip3 install -r requirements
+```
+
+```
+python3 manage.py makemigrations
+```
+
+```
+python3 manage.py migrate
 ```
 
 ```
@@ -42,3 +50,226 @@ python3 manage.py test
 | POST | `http://localhost:8000/agendar_consulta/` | Marca uma consulta para o usuário logado |
 | GET | `http://localhost:8000/agendas/` | Obtém as agendas livres |
 | DELETE | `http://localhost:8000/desmarcar_consulta/<int:id>` | Desmarca uma consulta do usuário logado |
+
+
+## Documentation of EndPoints
+
+### Endpoint:
+
+- POST: `/user_create/`
+
++ Request
+
+            {
+                
+                "username": "Maria",
+                "email":"Maria@gmail.com",
+                "password": "Maria12345",
+                
+            }
++ Response
+
+      {"token":"a394f0b3d620a3c8081d7beac398ea73ec14f1e4"}
+      
+### Endpoint:
+
+- POST: `/obter_token/`
+
++ Request
+
+            {
+                
+                "username": "Maria",
+                "password": "Maria12345",
+                
+            }
++ Response
+
+      {"token":"a394f0b3d620a3c8081d7beac398ea73ec14f1e4"}
+      
+      
+### Autenticação
+
+##### Com exceção dos endpoints /user_create/ e /obter_token/, para todos os outros devem ser enviado o token do usuário. Veja um exemplo
+
+```
+GET /medicos/
+Authorization: Token a394f0b3d620a3c8081d7beac398ea73ec14f1e4
+```
+
+### Para facilitar o processo de teste da aplicação é recomendável o uso do aplicativo Postman para fazer as requisições necessárias
+
+### EndPoint
+
+
+- GET: `/medicos/`
+
+        {
+          "id": 1,
+          "crm": "1234",
+          "nome_medico": "Medico 1",
+            "especialidade": [
+              {
+                "id": 1,
+                "nome_especialidade": "Urologia"
+              }
+          ]
+        },
+        {
+          "id": 2,
+          "crm": "4321",
+          "nome_medico": "Medico 2",
+          "especialidade": [
+            {
+                "id": 2,
+                "nome_especialidade": "Pediatria"
+            }
+        ]
+      }
+ 
+ #### Filtros
+ 
+ ```
+GET /medicos/?search=Joao&especialidade=1&especialidade=3
+```
+
+### EndPoint
+
+
+- GET: `/especialidades/`
+
+      {
+        "id": 1,
+        "nome_especialidade": "Urologia"
+      },
+      {
+        "id": 2,
+        "nome_especialidade": "Pediatria"
+      },
+      {
+        "id": 3,
+        "nome_especialidade": "Cardiologia"
+      },
+      {
+        "id": 4,
+        "nome_especialidade": "Oncologia"
+      }
+      
+#### Filtros
+ 
+ ```
+GET /especialidades/?search=ped
+```
+
+### EndPoint
+
+
+- GET: `/agendas/`
+
+        {
+          "id": 2,
+          "medico": {
+            "id": 1,
+            "crm": "1234",
+            "nome_medico": "Medico 1",
+            "especialidade": [
+                {
+                    "id": 1,
+                    "nome_especialidade": "Urologia"
+                }
+            ]
+        },
+        "dia": "2021-04-25",
+        "horarios": [
+            "17:00:00",
+            "18:00:00",
+            "19:00:00"
+        ]
+      },
+      {
+        "id": 4,
+        "medico": {
+            "id": 3,
+            "crm": "4567",
+            "nome_medico": "Medico 3",
+            "especialidade": [
+                {
+                    "id": 3,
+                    "nome_especialidade": "Cardiologia"
+                }
+            ]
+        },
+        "dia": "2021-04-26",
+        "horarios": [
+            "17:00:00",
+            "18:00:00",
+            "19:00:00"
+        ]
+      }
+ #### Filtros
+ 
+ ```
+GET /agendas/?medico=1&especialidade=2&data_inicio=2021-04-01&data_fim=2021-04-29
+```
+
+### Endpoint:
+
+- POST: `/agendar_consulta/`
+
++ Request
+
+            {
+                
+                "agenda_id": 5,
+                "horario":"18:00"
+                
+            }
++ Response
+
+      {
+        "id": 4,
+        "dia": "2021-04-27",
+        "horario": "18:00:00",
+        "data_agendamento": "2021-04-25T13:36:33.642614Z",
+        "medico": {
+              "id": 3,
+              "crm": "4567",
+              "nome": "Medico 3",
+              "especialidade": {
+                  "id": 3,
+                  "especialidade": "Cardiologia"
+              }
+        }
+      }
+      
+### Endpoint:
+
+- GET: `/consultas/`
+
+
++ Response
+
+      {
+        "id": 4,
+        "dia": "2021-04-27",
+        "horario": "18:00:00",
+        "data_agendamento": "2021-04-25T13:36:33.642614Z",
+        "medico": {
+              "id": 3,
+              "crm": "4567",
+              "nome": "Medico 3",
+              "especialidade": {
+                  "id": 3,
+                  "especialidade": "Cardiologia"
+              }
+        }
+      }
+      
+### Endpoint:
+
+- DELETE: `/desmarcar_consulta/<int:id>`
+
+
++ Response 200 OK
+
+      
