@@ -206,7 +206,19 @@ GET /especialidades/?search=ped
             "19:00:00"
         ]
       }
+      
+ #### Regras de negócio
+ 
++ As agendas vem ordenadas por ordem crescente de data
++ Agendas para datas passadas ou que todos os seus horários já foram preenchidos são excluídas da listagem
++ Horários dentro de uma agenda que já passaram ou que foram preenchidos devem ser excluídos da listagem
+
+
  #### Filtros
+ 
+ + Identificador de um ou mais médicos
+ + Identificador de uma ou mais especialidades
+ + Intervalo de data
  
  ```
 GET /agendas/?medico=1&especialidade=2&data_inicio=2021-04-01&data_fim=2021-04-29
@@ -241,7 +253,14 @@ GET /agendas/?medico=1&especialidade=2&data_inicio=2021-04-01&data_fim=2021-04-2
               }
         }
       }
-      
+#### Regras de negócio
+
++ A data em que o agendamento foi feito é salva ao se marcar uma consulta
++ Não é possível marcar uma consulta para um dia e horário passados
++ Não é possível marcar uma consulta se o usuário já possui uma consulta marcada no mesmo dia e horário
++ Não é possível marcar uma consulta se o dia e horário já foram preenchidos
+
+
 ### Endpoint:
 
 - GET: `/consultas/`
@@ -265,11 +284,23 @@ GET /agendas/?medico=1&especialidade=2&data_inicio=2021-04-01&data_fim=2021-04-2
         }
       }
       
+      
+#### Regras de negócio
+
++ A listagem não exibem consultas para dia e horário passados
++ Os itens da listagem vem ordenados por ordem crescente do dia e horário da consulta
+      
 ### Endpoint:
 
 - DELETE: `/desmarcar_consulta/<int:id>`
 
 
 + Response 200 OK
+
+#### Regras de negócio
+
++ Não é possível desmarcar uma consulta que não foi marcada pelo usuário logado
++ Não é possível desmarcar uma consulta que nunca foi marcada (identificador inexistente)
++ Não é possível desmarcar uma consulta que já aconteceu
 
       
