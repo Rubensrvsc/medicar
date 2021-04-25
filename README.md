@@ -1,7 +1,7 @@
 # Medicar
 
 
-## Repositorio do teste de backend engenieer na IntMed
+## Repositorio do teste de backend na IntMed
 
 ### Tecnologias usadas
 
