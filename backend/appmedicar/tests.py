@@ -44,7 +44,7 @@ class TesteMedicar(TestCase):
 
         m1 = Medico.objects.get(id=1)
 
-        a=Agenda.objects.create(dia='2021-04-25',medico=m1)
+        a=Agenda.objects.create(dia='2021-04-27',medico=m1)
         a.horario.add(h1)
         a.horario.add(h2)
 
