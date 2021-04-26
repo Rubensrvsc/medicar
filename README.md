@@ -32,7 +32,7 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 
-### Running Tests
+### Rodando os testes
 
 ```
 python3 manage.py test
