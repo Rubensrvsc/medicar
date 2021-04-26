@@ -44,7 +44,7 @@ python3 manage.py test
 |---|---|---|
 | POST | `http://localhost:8000/user_create/` | Cria um usuário |
 | GET | `http://localhost:8000/obter_token/` | Obtém o token de um usuário |
-| GET | `http://localhost:8000/especialidades/` | Obtém as especialidades cadastradas |
+| GET | `http://localhost:8000/especialidades/` | Obtém as especialidades cadastrados |
 | GET | `http://localhost:8000/medicos/` | Obtém os médicos cadastradas |
 | GET | `http://localhost:8000/consultas/` | Obtém as consultas do usuário logado |
 | POST | `http://localhost:8000/agendar_consulta/` | Marca uma consulta para o usuário logado |
