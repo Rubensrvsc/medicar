@@ -96,7 +96,6 @@ class AgendaListView(generics.ListAPIView):
 class ConsultaCreateView(generics.CreateAPIView):
 
     serializer_class = ConsultaSerializerCreate
-    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
     
