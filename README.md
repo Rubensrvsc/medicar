@@ -46,6 +46,15 @@ python3 manage.py runserver
 python3 manage.py test
 ```
 
+### Criando o superusuario
+
+```
+python3 manage.py createsuperuser
+```
+
+
+### Para facilitar o processo de teste da aplicação é recomendável o uso do aplicativo Postman para fazer as requisições necessárias
+
 ### EndPoints
 
 | Method |EndPoint | Description |
@@ -88,7 +97,7 @@ python3 manage.py test
             {
                 
                 "username": "Maria",
-                "password": "Maria12345",
+                "password": "Maria12345"
                 
             }
 + Response
@@ -104,8 +113,6 @@ python3 manage.py test
 GET /medicos/
 Authorization: Token a394f0b3d620a3c8081d7beac398ea73ec14f1e4
 ```
-
-### Para facilitar o processo de teste da aplicação é recomendável o uso do aplicativo Postman para fazer as requisições necessárias
 
 ### EndPoint
 
