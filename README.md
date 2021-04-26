@@ -12,9 +12,17 @@ SQLITE3
 Django
 Django Rest Framework
 ```
-### Running this project
+### Para rodar o projeto
 
-#### Entre na pasta backend e rode o seguintes comandos
+```
+git clone https://github.com/Rubensrvsc/medicar.git
+```
+
+```
+cd backend
+```
+
+#### Após entrar na pasta backend e rode o seguintes comandos
 
 ```
 pip3 install -r requirements
