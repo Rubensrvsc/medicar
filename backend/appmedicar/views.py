@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.utils.timezone import now,localtime,localdate 
 from django.db.models import Q
 from .serializers import *
+from .utils import *
 # Create your views here.
 
 class EspecialidadeListView(generics.ListAPIView):
@@ -53,6 +54,7 @@ class AgendaListView(generics.ListAPIView):
 
     serializer_class = AgendaSerializer
     queryset = Agenda.objects.all()
+    permission_classes = [permissions.AllowAny]
     
     def get_queryset(self):
         medico_params = self.request.query_params.getlist('medico',None)
@@ -60,94 +62,17 @@ class AgendaListView(generics.ListAPIView):
         data_inicio = self.request.query_params.get('data_inicio',None)
         data_fim = self.request.query_params.get('data_fim',None)
 
-        agenda = Agenda.objects.all()
-        agenda = Agenda.objects.filter(Q(dia__gte=localdate()) | Q(dia=localdate()) ).order_by('dia')
-        for i in agenda.filter(Q(dia__gte=localdate())): 
-            if i.dia == localdate():
-                hora_passada=0
-                hora_marcadas= i.consulta_agenda.filter(Q(isMarcada=True) & Q(horario__hora__gt=localtime())).count()
-                hora_passada = i.horario.filter(Q(hora__lt=localtime()) & Q(agenda__dia=localdate())).count()
-                hora_agenda= i.horario.count() 
-   
-                if hora_marcadas+ hora_passada == hora_agenda: 
-                    agenda=agenda.exclude(id=i.id) 
-            hora_marcadas= i.consulta_agenda.filter(Q(isMarcada=True)).count() 
 
-            hora_agenda= i.horario.count() 
-  
-            if hora_marcadas == hora_agenda: 
-                agenda=agenda.exclude(id=i.id) 
-        if medico_params:
-            condition_medico = Q()
-            for m in medico_params:
-                condition_medico |= Q(medico=m)
-            agenda = agenda.filter(condition_medico)
-        if especialidade_params:
-            condition_especialidade = Q()
-            for e in especialidade_params:
-                condition_especialidade |= Q(medico__especialidade_medico=e)
-            agenda = agenda.filter(condition_especialidade)
-        
-        if data_inicio and data_fim:
-            agenda = agenda.filter(Q(dia__range=[data_inicio,data_fim]))
-        
-        return agenda.all()
+        return agendas_filtro(medico_params,especialidade_params,data_inicio,data_fim,agendas_livres())
 
+
+#Refatorar o Post desse método
 class ConsultaCreateView(generics.CreateAPIView):
 
     serializer_class = ConsultaSerializerCreate
+    permission_classes = [permissions.AllowAny]
 
-    def post(self, request, *args, **kwargs):
-    
-        agenda = Agenda.objects.filter(id=request.data['agenda'])
-        
-        if agenda.exists() == True:
-            if agenda.filter(Q(dia__lt=localdate())).exists():
-                return Response({'Erro': 'Agenda é de um dia passado'},status=status.HTTP_401_UNAUTHORIZED)
-            agenda_hora_passada = agenda.get(id=request.data['agenda'])
-            if agenda_hora_passada.dia == localdate() and datetime.strptime(request.data['horario'],'%H:%M').time() < localtime().time():
-                return Response({'Erro': 'Agenda do dia de hoje mas o horário já passou'},status=status.HTTP_400_BAD_REQUEST)
-
-            agenda_user = Agenda.objects.get(id=request.data['agenda'])
-
-            consulta_cliente = Consulta.objects.filter(Q(agenda__id=agenda_user.id) & Q(agenda__dia=agenda_user.dia) 
-            & Q(horario__hora=request.data['horario']) & Q(cliente__username=self.request.user.username) & Q(isMarcada=True))
-            
-            if consulta_cliente.exists() == True:
-                return Response({'Erro': 'Cliente já marcou uma consulta para este dia e horario'},status=status.HTTP_401_UNAUTHORIZED)
-
-            consulta_ja_marcada = Consulta.objects.filter(Q(agenda__id=agenda_user.id) & Q(agenda__dia=agenda_user.dia) 
-            & Q(horario__hora=request.data['horario'])& Q(isMarcada=True))
-
-            if consulta_ja_marcada.exists() == True:
-                return Response({'Erro': 'Já existe uma consulta para este dia e horario'},status=status.HTTP_401_UNAUTHORIZED)
-            
-            if agenda_user.horario.filter(hora=request.data['horario']).exists()==False:
-                return Response({'Erro': 'Esse horario não existe nessa agenda'},status=status.HTTP_404_NOT_FOUND)
-
-            horario = Horario.objects.get(hora=request.data['horario'])
-            agenda = Agenda.objects.get(id=request.data['agenda'])
-            user = User.objects.get(username=self.request.user.username)
-            consulta_criada = Consulta.objects.create(agenda=agenda,cliente=user,
-            horario=horario)
-            
-            return Response({
-                'id':consulta_criada.id,
-                'dia':consulta_criada.agenda.dia,
-                'horario':consulta_criada.horario.hora,
-                'data_agendamento':consulta_criada.data_agendamento,
-                'medico':{
-                    'id': consulta_criada.agenda.medico.id,
-                    'crm':consulta_criada.agenda.medico.crm,
-                    'nome': consulta_criada.agenda.medico.nome_medico,
-                    'especialidade':{
-                        'id': consulta_criada.agenda.medico.especialidade_medico.id,
-                        'especialidade': consulta_criada.agenda.medico.especialidade_medico.nome_especialidade
-                    },
-                },
-            })
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
+#Refatorar o Destroy desse método
 class DesmarcarConsultaView(generics.DestroyAPIView):
     serializer_class = DesmarcarConsultaSerializer
     queryset = Consulta.objects.all()
