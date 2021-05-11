@@ -117,9 +117,12 @@ class AgendaSerializer(serializers.ModelSerializer):
         lista = []
         if instance.dia == localdate():
             if instance.consulta_agenda.count()==0:
+                return instance.horario.all().values("hora")
                 for j in instance.horario.filter(hora__gt=localtime()):
                     lista.append(j.hora)
             elif instance.consulta_agenda.count()>0:
+                return instance.horario.filter(~Q(hora__in=instance.consulta_agenda.all().values("horario__hora")) & 
+                Q(hora__gt=localtime())).values("hora")
                 for i in instance.consulta_agenda.all(): 
                     for j in instance.horario.filter(hora__gt=localtime()): 
                         if j.hora != i.horario.hora: 
