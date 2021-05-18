@@ -46,7 +46,7 @@ class ConsultaSerializerCreate(serializers.Serializer):
     horario = serializers.TimeField()
 
     def validate(self, data):
-        print(self.context['request'].user)
+
         agenda = Agenda.objects.filter(id=data['agenda'])
         if agenda.exists() == False:
             raise serializers.ValidationError("Essa agenda não existe")
@@ -75,28 +75,7 @@ class ConsultaSerializerCreate(serializers.Serializer):
             raise serializers.ValidationError("Já existe uma consulta para este dia e horario")
             
         return agenda
-    def create(self, validated_data):
-        horario = Horario.objects.get(hora=validated_data['horario'])
-        agenda = Agenda.objects.get(id=validated_data['agenda'])
-        user = User.objects.get(username=self.context['request'].user.username)
-        consulta_criada = Consulta.objects.create(agenda=agenda,cliente=user,
-            horario=horario)
-        return Response({
-                'id':consulta_criada.id,
-                'dia':consulta_criada.agenda.dia,
-                'horario':consulta_criada.horario.hora,
-                'data_agendamento':consulta_criada.data_agendamento,
-                'medico':{
-                    'id': consulta_criada.agenda.medico.id,
-                    'crm':consulta_criada.agenda.medico.crm,
-                    'nome': consulta_criada.agenda.medico.nome_medico,
-                    'especialidade':{
-                        'id': consulta_criada.agenda.medico.especialidade_medico.id,
-                        'especialidade': consulta_criada.agenda.medico.especialidade_medico.nome_especialidade
-                    },
-                },
-            })
-
+    
 
 class UserSerializer(serializers.ModelSerializer):
     
