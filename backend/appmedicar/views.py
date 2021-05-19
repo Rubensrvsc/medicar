@@ -73,28 +73,6 @@ class ConsultaCreateView(generics.CreateAPIView):
     serializer_class = ConsultaSerializerCreate
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request, *args, **kwargs):
-        horario = Horario.objects.get(hora=request.data['horario'])
-        agenda = Agenda.objects.get(id=request.data['agenda'])
-        user = User.objects.get(username=request.user.username)
-        consulta_criada = Consulta.objects.create(agenda=agenda,cliente=user,
-            horario=horario)
-        return Response({
-                'id':consulta_criada.id,
-                'dia':consulta_criada.agenda.dia,
-                'horario':consulta_criada.horario.hora,
-                'data_agendamento':consulta_criada.data_agendamento,
-                'medico':{
-                    'id': consulta_criada.agenda.medico.id,
-                    'crm':consulta_criada.agenda.medico.crm,
-                    'nome': consulta_criada.agenda.medico.nome_medico,
-                    'especialidade':{
-                        'id': consulta_criada.agenda.medico.especialidade_medico.id,
-                        'especialidade': consulta_criada.agenda.medico.especialidade_medico.nome_especialidade
-                    },
-                },
-            })
-
 #Refatorar o Destroy desse método
 class DesmarcarConsultaView(generics.DestroyAPIView):
     serializer_class = DesmarcarConsultaSerializer
