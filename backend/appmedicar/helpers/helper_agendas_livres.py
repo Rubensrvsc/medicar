@@ -1,4 +1,4 @@
-from .models import Agenda
+from ..models import Agenda
 from django.utils.timezone import now,localtime,localdate 
 from django.db.models import Q
 

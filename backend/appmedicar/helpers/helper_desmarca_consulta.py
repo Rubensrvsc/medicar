@@ -1,4 +1,4 @@
-from .models import Consulta
+from ..models import Consulta
 from django.utils.timezone import now,localtime,localdate 
 from django.db.models import Q
 from rest_framework.response import Response
