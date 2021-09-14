@@ -9,6 +9,7 @@ from django.db.models import Q
 from .serializers import *
 from .helpers.helper_agendas_livres import *
 from .helpers.helper_desmarca_consulta import *
+import pdb
 # Create your views here.
 
 class EspecialidadeListView(generics.ListAPIView):
